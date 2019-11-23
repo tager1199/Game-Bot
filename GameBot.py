@@ -13,32 +13,35 @@ import discord
 import random
 import urllib.request
 import os
+import asyncio
+import tracemalloc
+from discord.ext import tasks
 from os import walk
 from discord.utils import get
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 #Variables that contains the user credentials to access Twitter API
-f = open("C:/Users/computing/Desktop/DoggoBot/TOKEN.txt", "r")
+f = open("C:/Users/computing/Desktop/GameBot/Game-Bot/TOKEN.txt", "r")
 TOKEN = f.read();
-
+playGuesser = False
+global emoji
 client = discord.Client()
+tracemalloc.start()
 
+global gameChannel
 @client.event
 async def on_message(message):
     rand = random.randint(0,200)
-    TrueMsg = message
-    message = message.content.lower()
+    global playGuesser
+    global emoji
+    global gameChannel
     msg = ""
     author = message.author
     channel = message.channel
-    #Add Emoji Reaction to any message containing 'bork'
-    #if "bork" in text:
-        #await message.add_reaction("\U0001F415")
-
+    TrueMsg = message
+    message = message.content.lower()
     #if message author is this bot
     if author == client.user:
-        #Add emoji reaction to any message sent by the bot
-        #await message.add_reaction("\U0001F436")
         #stop the bot replying to itself
         return
 
@@ -49,18 +52,48 @@ async def on_message(message):
 
     if message.startswith('&play '):
         m = message[6:]
-        print m
-        if m.strip() = 'guesser':
-            for emoji in client.emoji():
-                await message.channel.send(emoji)
+        if m.strip() == 'guesser':
+            if playGuesser == False:
+                playGuesser = True
+                gameChannel = channel
+                await channel.send('Starting a game of Guesser\
+                \nOnce the game starts you\'ll have 60seconds to guess the randomly selected emoji\
+                \nOnly guesses with a single emoji will be counted please dont send multiple in the same message')
+                emoji = random.choice(client.emojis)
+
+                await asyncio.sleep(1)
+                await gameChannel.send('Game of guesser starting....')
+                await asyncio.sleep(1)
+                await gameChannel.send('NOW!!!!')
+                await asyncio.sleep(30)
+                if playGuesser == True:
+                    await gameChannel.send('30 Seconds Left! :timer:')
+                    await asyncio.sleep(20)
+                    if playGuesser == True:
+                        await gameChannel.send('10 Seconds Left! :timer:')
+                        await asyncio.sleep(10)
+                        if playGuesser == True:
+                            await gameChannel.send('Unfortunatley no one guessed the emoji correctly. \nThe emoji was: ')
+                            await gameChannel.send(emoji)
+                            playGuesser = False
+            else:
+                await channel.send('A Game of guesser is already ongoing')
 
 
-    if (text.startswith('&help')
-        msg = "$play - play a game \nAvailable Games: \n  - Gusser - 60secs to guess the emoji \n - Werewolves - A discord version of the card game werewolves\
-        \n$help - Show this help menu\
-        \n\n***If you have an issue with the bot please contact tinyman1199#6969***"
+    if playGuesser == True:
+        if message == str(emoji):
+            await gameChannel.send(('Congratualtions {0.author.mention}. You guessed correctly. \n The emoji was: ').format(TrueMsg))
+            await gameChannel.send(emoji)
+            playGuesser = False
 
-        await message.channel.send(msg)
+
+    if (message.startswith('&help')):
+        msg = '''$play - play a game \nAvailable Games:\n  - Guesser - 60secs to guess the emoji
+        - Werewolves - A discord version of the card game werewolves
+        $help - Show this help menu
+        \n\n***If you have an issue with the bot please contact tinyman1199#6969***'''
+
+        await channel.send(msg)
 
     #if "test" in text:
     #    embed = discord.Embed();
