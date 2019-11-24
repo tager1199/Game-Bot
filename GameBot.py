@@ -21,17 +21,19 @@ from discord.utils import get
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 #Variables that contains the user credentials to access Twitter API
-f = open("C:/Users/computing/Desktop/GameBot/Game-Bot/TOKEN.txt", "r")
+f = open("TOKEN.txt", "r")
 TOKEN = f.read();
 playGuesser = False
 global emoji
 client = discord.Client()
 tracemalloc.start()
-
+file = open("C:\\Users\\computing\\Desktop\\GameBot\\Game-Bot\\uniqueEmojis.txt",'r')
+emojiList = file.readlines()
 global gameChannel
 @client.event
 async def on_message(message):
     rand = random.randint(0,200)
+    emojiList.append(client.emojis)
     global playGuesser
     global emoji
     global gameChannel
@@ -52,6 +54,7 @@ async def on_message(message):
 
     if message.startswith('&play '):
         m = message[6:]
+        await channel.send("\ud83d\ude00")
         if m.strip() == 'guesser':
             if playGuesser == False:
                 playGuesser = True
@@ -59,10 +62,8 @@ async def on_message(message):
                 await channel.send('Starting a game of Guesser\
                 \nOnce the game starts you\'ll have 60seconds to guess the randomly selected emoji\
                 \nOnly guesses with a single emoji will be counted please dont send multiple in the same message')
-                emoji = random.choice(client.emojis)
-
-                await asyncio.sleep(1)
                 await gameChannel.send('Game of guesser starting....')
+                emoji = random.choice(emojiList)
                 await asyncio.sleep(1)
                 await gameChannel.send('NOW!!!!')
                 await asyncio.sleep(30)
