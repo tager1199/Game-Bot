@@ -24,6 +24,8 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 f = open("TOKEN.txt", "r")
 TOKEN = f.read();
 playGuesser = False
+playWerewolves = False
+WerewolvesPlayers = []
 global emoji
 client = discord.Client()
 tracemalloc.start()
@@ -130,15 +132,13 @@ emojiList = ['\U0001f600','\U0001f62c','\U0001f601','\U0001f602','\U0001f603','\
 '\U0001f1e7\U0001f1f6','\U0001f1fb\U0001f1f3']
 global gameChannel
 global fileback
-fileback = open("C:\\Users\\computing\\Desktop\\not_working.txt",'a')
 global list
 @client.event
 async def on_message(message):
     global CodeFile
     rand = random.randint(0,200)
-    for i in client.emojis:
-        emojiList.append(i)
     global playGuesser
+    global playWerewolves
     global emoji
     global gameChannel
     msg = ""
@@ -156,7 +156,7 @@ async def on_message(message):
         #stop bot from responding
         return
 
-    if message.startswith('&play'):
+    if (message.startswith('&play') and str(author) == "tinyman1199#6969"):
         m = message[6:]
         if m.strip() == 'guesser':
             if playGuesser == False:
@@ -166,9 +166,11 @@ async def on_message(message):
                 await channel.send('Starting a game of Guesser')
                 a = await channel.send('\nOnce the game starts you\'ll have 60seconds to guess the randomly selected emoji\
                 \nOnly guesses with a single emoji will be counted please dont send multiple in the same message')
+                await channel.send("The are " + str(len(emojiList)) + " potential emojis, including " + str(len(client.emojis)) +" custom emojis from this server!")
+
                 b = await gameChannel.send("Game of guesser starting....")
-                emoji = random.choice(emojiList).rstrip().strip()
-                await asyncio.sleep(1)
+                emoji = random.choice(emojiList)
+                await asyncio.sleep(2)
                 c = await gameChannel.send("NOW!!!!")
                 await asyncio.sleep(30)
                 if playGuesser == True:
@@ -189,13 +191,83 @@ async def on_message(message):
             else:
                 await channel.send('A Game of guesser is already ongoing')
         elif m.strip() == 'werewolves':
-            await channel.send("Game of Werewolves starting....")
+            if playWerewolves == False:
+                await channel.send("Game of Werewolves starting....")
+                await channel.send("Join the game with &join\nYou have 60secsonds to join")
+                playWerewolves = True
+                werewolfChannel = channel
+                await asyncio.sleep(60)
+                numPlayers = len(WerewolvesPlayers)
+                numWerewolves = 2
+                if numPlayers < 8:
+                    await werewolfChannel.send("Unfortunatley not enough players joined to start a game of Werewolves. :sadhaw:")
+                    playWerewolves = False;
+                else:
+                    await werewolfChannel.send("Game of Werewolves starting now")
+                    if (numPlayers == 18):
+                        numWerewolves = 4
+                    elif (numPlayers > 11):
+                        numWerewolves = 3
+                    random.shuffle(WerewolvesPlayers)
+                    players = {}
+                    townsPeople = []
+                    werewolves = []
+                    for i in range(0,numPlayers):
+                        if i < numWerewolves:
+                            players[WerewolvesPlayers[i]] = "werewolf"
+                            werewolves.append(WerewolvesPlayers[i])
+                        else:
+                            townsPeople.append(WerewolvesPlayers[i])
+
+                        j = i - numWerewolves
+                        if j == 0:
+                            players[WerewolvesPlayers[i]] = "Fortune Teller"
+                            await WerewolvesPlayers[i].send("You are the Fortune Teller.\nEach night, you can see the true personality of one player of your choice.\n Your objective is to help the town kill all the werewolves.  Good Luck!")
+                        elif j == 1:
+                            players[WerewolvesPlayers[i]] = "Witch"
+                            await WerewolvesPlayers[i].send("You are the Witch.\nYou have 2 potions, a healing one and a killing one. They may only be used once!\nEach night you will be given the choice to use one or both potions. You may use them on anyone, including yourself.\n Your objective is to help the town kill all the werewolves.  Good Luck!")
+                        elif j == 8:
+                            players[WerewolvesPlayers[i]] = "Hunter"
+                            await WerewolvesPlayers[i].send("You are the Hunter.\nIf you are killed by the Werewolves, or lynched by the Townsfolk, you can retaliate. Killing a person of your choice\n Your objective is to help the town kill all the werewolves. Good Luck!")
+                        elif j == 0:
+                            players[WerewolvesPlayers[i]] = "Cupido"
+                            await WerewolvesPlayers[i].send("You are Cupid.\nAt the start of the game you will choose 2 players to fall madly in love with each other\nAfter this you are just a normal Towns Person and your objective is to help the town kill all the werewolves. Good Luck!")
+                        elif j == 10:
+                            players[WerewolvesPlayers[i]] = "Thief"
+                            await WerewolvesPlayers[i].send("You are the Thief.\nAt the start of the game you will be shown 2 extra cards and may choose to swap your role to one of them\nThis may your objective.")
+                        else:
+                            players[WerewolvesPlayers[i]] = "Towns Person"
+                            await WerewolvesPlayers[i].send("You are just a normal Towns Person.\nYour only aim is to rid the town of all the werewolves. Good Luck!")
+                    for i in range(0,len(werewolves)):
+                        str1 = ""
+                        s = [x for j,x in enumerate(werewolves) if j!=i]
+                        for ele in s:
+                            str1 += ele + ", "
+                        await werewolves[i].send("You are a Werewolf.\nYour fellow Werewolves are: " + str1 + "\nIt is recommended you create a DM group with them to discuss with each other.\nEach night, you will all vote for who you want to kill and the person with the most vote will die\n Your objective is to evade detection and kill the whole town. Good Luck!")
+                    await werewolfChannel.send("Roles have been assigned, check your DMs")
+                    await werewolfChannel.send("The Game will now begin.")
+                    await werewolfChannel.send("Deep in the American countryside, the little town of Millers Hollow has recently been infiltrated by Werewolves.", tts=True)
+                    await werewolfChannel.send("Each night, murders are committed by the Townsfolk, who due to some mysterious phenomenon (possibly the greenhouse effect)have become Werewolves.", tts=True)
+                    await werewolfChannel.send("It is now time to take control and eliminate this ancient evil, before the town loses its last few inhabitants.", tts=True)
+                    playWerewolves = False;
+
+            else:
+                await channel.send("Game of Werewolves already in progress/setup")
         else:
             await channel.send("I'd love to play with you but I need a valid game name. \nValid games are: \n - Guesser \n - Werewolves")
 
+    if (playWerewolves == True):
+        if (message.strip() == '&join'):
+            print("test")
+            if len(WerewolvesPlayers) < 18:
+                WerewolvesPlayers.append(author)
+                await channel.send("You successfully joined the game.")
+            else:
+                await channel.send("Sorry but the maxium number of players has been reached\nThe game will begin shortly!")
+
 
     if playGuesser == True:
-        if ((message == str(emoji)) or TrueMsg.content.encode('unicode-escape').decode('ASCII') == str(emoji)):
+        if (message == str(emoji) or TrueMsg.content.encode('unicode-escape').decode('ASCII') == str(emoji)):
             await gameChannel.send(('Congratualtions {0.author.mention}. You guessed correctly. \n The emoji was: ').format(TrueMsg))
             await gameChannel.send(emoji)
             playGuesser = False
@@ -209,11 +281,13 @@ async def on_message(message):
 
         await channel.send(msg)
 
-    #if "test" in text:
-    #    embed = discord.Embed();
-    #    embed.set_thumbnail(url='https://images.dog.ceo/breeds/chow/n02112137_5089.jpg')
-    #    await message.channel.send(embed=embed)
-
+    if "test" in message and str(author) == "tinyman1199#6969":
+        embed = discord.Embed();
+        embed.set_thumbnail(url='https://en.wikipedia.org/wiki/Fruit#/media/File:Culinary_fruits_front_view.jpg')
+        await channel.send(embed=embed)
+        embed.set_thumbnail(url='https://icon-library.net//images/spacebar-icon/spacebar-icon-25.jpg')
+        await channel.send(embed=embed)
+        await channel.send("Current Weather: It dark and cold outside.")
 
 
 
@@ -225,5 +299,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+    for i in client.emojis:
+        emojiList.append(i)
 
 client.run(TOKEN)
