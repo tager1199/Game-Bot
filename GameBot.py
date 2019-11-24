@@ -27,7 +27,7 @@ playGuesser = False
 global emoji
 client = discord.Client()
 tracemalloc.start()
-emojiList = ['\U0001f600','\U0001f62c','\U0001f601','\U0001f602','\U0001f603','\U0001f604','\U0001f605','\U0001f606','\U0001f607','\U0001f609','\U0001f60a','\U0001f642','\U0001f643','\u263a','\U0001f60b','\U0001f60c',
+emojiList = ['\U0001f600','\U0001f62c','\U0001f601','\U0001f602','\U0001f603','\U0001f604','\U0001f605','\U0001f606','\U0001f607','\U0001f609','\U0001f642','\U0001f643','\u263a','\U0001f60b','\U0001f60c',
 '\U0001f60d','\U0001f618','\U0001f617','\U0001f619','\U0001f61a','\U0001f61c','\U0001f61d','\U0001f61b','\U0001f911','\U0001f913','\U0001f60e','\U0001f917','\U0001f60f','\U0001f636','\U0001f610','\U0001f611',
 '\U0001f612','\U0001f644','\U0001f914','\U0001f633','\U0001f61e','\U0001f61f','\U0001f620','\U0001f621','\U0001f614','\U0001f615','\U0001f641','\u2639','\U0001f623','\U0001f616','\U0001f62b','\U0001f629',
 '\U0001f624','\U0001f62e','\U0001f631','\U0001f628','\U0001f630','\U0001f62f','\U0001f626','\U0001f627','\U0001f622','\U0001f625','\U0001f62a','\U0001f613','\U0001f62d','\U0001f635','\U0001f632','\U0001f910',
@@ -129,12 +129,15 @@ emojiList = ['\U0001f600','\U0001f62c','\U0001f601','\U0001f602','\U0001f603','\
 '\U0001f1f8\U0001f1fd','\U0001f1f8\U0001f1f8','\U0001f1f9\U0001f1e8','\U0001f1f2\U0001f1eb','\U0001f3f3\ufe0f\u200d\U0001f308','\U0001f1f2\U0001f1f5','\U0001f1e6\U0001f1f8','\U0001f1ec\U0001f1f8',
 '\U0001f1e7\U0001f1f6','\U0001f1fb\U0001f1f3']
 global gameChannel
+global fileback
+fileback = open("C:\\Users\\computing\\Desktop\\not_working.txt",'a')
 global list
 @client.event
 async def on_message(message):
     global CodeFile
     rand = random.randint(0,200)
-    emojiList.append(client.emojis)
+    for i in client.emojis:
+        emojiList.append(i)
     global playGuesser
     global emoji
     global gameChannel
@@ -152,6 +155,7 @@ async def on_message(message):
     if author.bot == True:
         #stop bot from responding
         return
+
     if message.startswith('&play'):
         m = message[6:]
         if m.strip() == 'guesser':
