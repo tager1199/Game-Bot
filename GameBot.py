@@ -222,7 +222,7 @@ async def on_message(message):
                         j = i - numWerewolves
                         if j == 0:
                             players[WerewolvesPlayers[i]] = "Fortune Teller"
-                            await WerewolvesPlayers[i].send("You are the Fortune Teller.\nEach night, you can see the true personality of one player of your choice.\n Your objective is to help the town kill all the werewolves.  Good Luck!")
+                            await WerewolvesPlayers[i].send("You are the Fortune Teller.\nEach night, you can see the true personality of one player of your choice.\nYour objective is to help the town kill all the werewolves.  Good Luck!")
                         elif j == 1:
                             players[WerewolvesPlayers[i]] = "Witch"
                             await WerewolvesPlayers[i].send("You are the Witch.\nYou have 2 potions, a healing one and a killing one. They may only be used once!\nEach night you will be given the choice to use one or both potions. You may use them on anyone, including yourself.\n Your objective is to help the town kill all the werewolves.  Good Luck!")
